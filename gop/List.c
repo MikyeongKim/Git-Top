@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 
-
 List newList() {
 	List list;
 	memset(&list, 0, sizeof(list));
@@ -51,10 +50,10 @@ int Remove(List* this, Data data) {
 	int i = 0;
 
 	if (currentNode == NULL) {
-		printf("노드가 하나도 없쪙\n");
+		printf("There's no exist data\n");
 		return 0;
 	}
-	else if (currentNode->data.pid == data.pid) /// 해더가 가르키는 노드일때
+	else if (currentNode->data.pid == data.pid) // 헤더가 가르키는 노드일때
 	{
 		temp = this->header;
 		this->header = this->header->next;
@@ -62,13 +61,10 @@ int Remove(List* this, Data data) {
 		this->length--;
 		return 1;
 	}
-	else
-	{
-		for (i = 0; i < this->length - 1; i++)
-		{
+	else{
+		for (i = 0; i < this->length - 1; i++){
+			if (currentNode->next->data.pid == data.pid){
 
-			if (currentNode->next->data.pid == data.pid)
-			{
 				temp = currentNode->next;
 				currentNode->next = currentNode->next->next;
 				free(temp);
@@ -82,66 +78,66 @@ int Remove(List* this, Data data) {
 }
 
 
-
 Data SearchByPID(List* this, unsigned int pid) {
 	Node * node = this->header;
 	Data data;
 	memset(&data, 0, sizeof(data));
 	int i = 0;
-	if (this->length <= 0)
-	{
-		printf("찾는 데이터가 업서요\n");
+	if (this->length <= 0){
+		printf("non exist matched data\n");
 		return data;
 	}
-	else
-	{
-		for (i = 0; i < this->length; i++)
-		{
+	else{
+		for (i = 0; i < this->length; i++){
 			if (node->data.pid == pid)
 			{
 				return node->data;
 			}
 			node = node->next;
 		}
-		printf("찾는 데이터가 업서요\n");
+		printf("non exist such data\n");
 		return data;
 	}
 
 }
 
-void Print(List *this) {
+void Print(List *this){
 	int i = 0;
 	Node *currentNode = this->header;
-	if (this->length == 0) {
+	if (this->length == 0){
 		printf("non existing Data\n");
 		return;
 	}
 
-	for (i = 0; i < this->length; i++) {
+	for (i = 0; i < this->length; i++){
 		Data_Print(currentNode->data);
 		currentNode = currentNode->next;
 	}
 }
 
-void Data_Print(Data data)
-{
-	printf("%s\t", data.user); //char user[strLen];
+void Data_Print(Data data){
+	printf("%5d\t", data.pid); //unsigned int pid;
+	printf("%-10s\t", data.user); //char user[strlen];
+	printf("%.2f\t", data.per_cpu);//double per_cpu;
+	printf("%.2f\t", data.per_mem);//double per_mem;
+	printf("%-15s\t", data.commend);//char commend[strLen];
+	printf("\n");
+
+	/*
+	   //not yet
 	printf("%s\t", data.pr); //char pr[strLen];
 	printf("%c\t", data.ni); //	char ni;
-	printf("%d\t", data.pid); //unsigned int pid;
 	printf("%u\t", data.virt); //unsigned int virt;
 	printf("%u\t", data.res); //unsigned int res;
 	printf("%u\t", data.shr); //unsigned int shr;
 	printf("%c\t", data.s); //char s;
-	printf("%u\t", data.per_cpu);//unsigned per_cpu;
-	printf("%f\t", data.per_mem);//float per_mem;
 	printf("%u\t", data.time);//unsigned long time;
-	printf("%s\t", data.commend);//char commend[strLen];
 	printf("\n");
+	*/
 }
 
-void Data_Sort_By_PerCpu(List *this) // percpu 기준 정렬
-{
+void Data_Sort_By_PerCpu(List *this){ // percpu 기준 정렬
+
 	int cnt = 0;
 	Node* loop = this->header;
 	Data* resList = malloc(sizeof(Data)*this->length);
@@ -149,41 +145,48 @@ void Data_Sort_By_PerCpu(List *this) // percpu 기준 정렬
 		memcpy(&resList[cnt], &loop->data, sizeof(loop->data));
 		loop = loop->next;
 	}
+
 	qsort(resList, this->length, sizeof(*resList), comp);
 	loop = this->header;
 	for (cnt = 0; cnt < this->length; cnt++) {
 		memcpy(&loop->data, &resList[cnt], sizeof(loop->data));
 		loop = loop->next;
 	}
+
 	free(resList);
 }
 
-int comp(const void * elem1, const void * elem2)
-{
+
+int comp(const void * elem1, const void * elem2){	//내림차순
+
 	Data* f = ((Data*)elem1);
 	Data* s = ((Data*)elem2);
 	return (int)(s->per_cpu - f->per_cpu);
 }
 
-int main() {
+/*
+int main(){
 	List list = newList();
-	Data test, test2, test3, return_Data;
-	memset(&test, 0, sizeof(test));
-	memset(&test2, 0, sizeof(test));
-	memset(&test3, 0, sizeof(test));
-	test.per_cpu = 4;
-	test2.per_cpu = 7;
-	test3.per_cpu = 3;
-	test.pid = 1;
-	test2.pid = 2;
-	test3.pid = 2;
+
+	//프로그램 확인을 위한 임시데이터 삽입
+
+	int m=0;
+	Data test[3];
+	double f = 3.5;
+	
+	for(m=0;m<3;m++){
+
+		memset(&test[m], 0, sizeof(test[m]));
+		test[m].pid=m;
+		//test[m].user="abcd";
+		strcpy(test[m].user , "가나다라");
+		test[m].per_cpu=m+f;
+		list.Add(&list,test[m]);
+	} 
 
 
-	list.Add(&list, test);
-	list.Add(&list, test2);
-	list.Add(&list, test3);
-	list.Print(&list);
 	list.Sort(&list);
 	list.Print(&list);
-	getchar();
+	//getchar();
 }
+*/

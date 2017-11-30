@@ -1,20 +1,22 @@
-#define Data ProcessInfo
-#define strLen 10
+#define Data pInfo
+#define strLen 15
 
-typedef struct processInfo{
-	unsigned int pid;
-	char user[strLen];
-	char pr[strLen];
-	char ni;
-	unsigned int virt;
-	unsigned int res;
-	unsigned int shr;
-	char s;
-	unsigned per_cpu;
-	float per_mem;
-	unsigned long time;
-	char commend[strLen];
-}ProcessInfo;
+typedef struct pInfo{
+	unsigned int pid;		//PID
+	char user[strLen];		//USERNAME
+	double per_cpu;			//CPU
+	double per_mem;			//MEMORY
+	char commend[strLen];	//COMMAND
+
+	//not yet
+//	char pr[strLen];
+//	char ni;
+//	unsigned int virt;
+//	unsigned int res;
+//	unsigned int shr;
+//	char s;
+//	unsigned long time;
+}PInfo;
 
 typedef struct node{
 	Data data;
@@ -37,7 +39,5 @@ int Remove(List*,Data);
 Data SearchByPID(List*,unsigned int);
 void Print(List*);
 void Data_Print(Data data);
-
 void Data_Sort_By_PerCpu(List *this);
-
 int comp(const void * elem1, const void * elem2); 
